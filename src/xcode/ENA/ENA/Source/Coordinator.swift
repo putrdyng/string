@@ -142,7 +142,7 @@ extension Coordinator: HomeViewControllerDelegate {
 		rootViewController.pushViewController(vc, animated: true)
 	}
 
-	func showExposureDetection(state: HomeInteractor.State, isRequestRiskRunning: Bool) {
+	func showExposureDetection(state: HomeViewController.State, isRequestRiskRunning: Bool) {
 		let state = ExposureDetectionViewController.State(
 			exposureManagerState: state.exposureManagerState,
 			detectionMode: state.detectionMode,
@@ -161,7 +161,7 @@ extension Coordinator: HomeViewControllerDelegate {
 		rootViewController.present(vc, animated: true)
 	}
 
-	func setExposureDetectionState(state: HomeInteractor.State, isRequestRiskRunning: Bool) {
+	func setExposureDetectionState(state: HomeViewController.State, isRequestRiskRunning: Bool) {
 		let state = ExposureDetectionViewController.State(
 			exposureManagerState: state.exposureManagerState,
 			detectionMode: state.detectionMode,
@@ -276,7 +276,6 @@ extension Coordinator: ExposureStateUpdating {
 
 extension Coordinator: ENStateHandlerUpdating {
 	func updateEnState(_ state: ENStateHandler.State) {
-		homeController?.updateEnState(state)
 		updateAllState(state)
 	}
 
