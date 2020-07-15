@@ -25,7 +25,7 @@ final class HomeViewController: UIViewController {
 		didSet {
 			setStateOfChildViewControllers()
 			scheduleCountdownTimer()
-			buildSections()
+			setupSections()
 		}
 	}
 
@@ -93,7 +93,7 @@ final class HomeViewController: UIViewController {
 		configureDataSource()
 		setupAccessibility()
 
-		buildSections()
+		setupSections()
 		// updateSections()
 		applySnapshotFromSections()
 
@@ -402,11 +402,69 @@ extension HomeViewController: RequiresAppDependencies {
 
 	}
 
-	func buildSections() {
-		sections = initialCellConfigurators()
+	private func actionSectionDefinition() -> SectionDefinition {
+		var actionsConfigurators: [CollectionViewCellConfiguratorAny] = []
+
+		// MARK: - Add cards that are always shown.
+
+		// Active card.
+		activeConfigurator = HomeActivateCellConfigurator(state: state.enState)
+		actionsConfigurators.append(activeConfigurator)
+
+		// MARK: - Add cards depending on result state.
+
+		if store.lastSuccessfulSubmitDiagnosisKeyTimestamp != nil {
+			// This is shown when we submitted keys! (Positive test result + actually decided to submit keys.)
+			// Once this state is reached, it cannot be left anymore.
+
+			let thankYou = HomeThankYouRiskCellConfigurator()
+			actionsConfigurators.append(thankYou)
+			log(message: "Reached end of life state.", file: #file, line: #line, function: #function)
+
+		} else if store.registrationToken != nil {
+			// This is shown when we registered a test.
+			// Note that the `positive` state has a custom cell and the risk cell will not be shown once the user was tested positive.
+
+			switch self.testResult {
+			case .none:
+				// Risk card.
+				if let risk = setupRiskConfigurator() {
+					actionsConfigurators.append(risk)
+				}
+
+				// Loading card.
+				let testResultLoadingCellConfigurator = HomeTestResultLoadingCellConfigurator()
+				actionsConfigurators.append(testResultLoadingCellConfigurator)
+
+			case .positive:
+				let findingPositiveRiskCellConfigurator = setupFindingPositiveRiskCellConfigurator()
+				actionsConfigurators.append(findingPositiveRiskCellConfigurator)
+
+			default:
+				// Risk card.
+				if let risk = setupRiskConfigurator() {
+					actionsConfigurators.append(risk)
+				}
+
+				let testResultConfigurator = setupTestResultConfigurator()
+				actionsConfigurators.append(testResultConfigurator)
+			}
+		} else {
+			// This is the default view that is shown when no test results are available and nothing has been submitted.
+
+			// Risk card.
+			if let risk = setupRiskConfigurator() {
+				actionsConfigurators.append(risk)
+			}
+
+			let submitCellConfigurator = setupSubmitConfigurator()
+			actionsConfigurators.append(submitCellConfigurator)
+		}
+
+		return (.actions, actionsConfigurators)
 	}
 
-	private func initialCellConfigurators() -> SectionConfiguration {
+	private func infoSectionDefinition() -> SectionDefinition {
 
 		let info1Configurator = HomeInfoCellConfigurator(
 			title: AppStrings.Home.infoCardShareTitle,
@@ -422,6 +480,11 @@ extension HomeViewController: RequiresAppDependencies {
 			accessibilityIdentifier: AccessibilityIdentifiers.Home.infoCardAboutTitle
 		)
 
+		return (.infos, [info1Configurator, info2Configurator])
+	}
+
+	private func settingsSectionDefinition() -> SectionDefinition {
+
 		let appInformationConfigurator = HomeInfoCellConfigurator(
 			title: AppStrings.Home.appInformationCardTitle,
 			description: nil,
@@ -436,17 +499,15 @@ extension HomeViewController: RequiresAppDependencies {
 			accessibilityIdentifier: AccessibilityIdentifiers.Home.settingsCardTitle
 		)
 
-		let infosConfigurators: [CollectionViewCellConfiguratorAny] = [info1Configurator, info2Configurator]
-		let settingsConfigurators: [CollectionViewCellConfiguratorAny] = [appInformationConfigurator, settingsConfigurator]
+		return (.settings, [appInformationConfigurator, settingsConfigurator])
 
-		let actionsSection: SectionDefinition = setupActionSectionDefinition()
-		let infoSection: SectionDefinition = (.infos, infosConfigurators)
-		let settingsSection: SectionDefinition = (.settings, settingsConfigurators)
+	}
 
-		var sections: [(section: HomeViewController.Section, cellConfigurators: [CollectionViewCellConfiguratorAny])] = []
-		sections.append(contentsOf: [actionsSection, infoSection, settingsSection])
-
-		return sections
+	func setupSections() {
+		let actionsSection: SectionDefinition = actionSectionDefinition()
+		let infoSection: SectionDefinition = infoSectionDefinition()
+		let settingsSection: SectionDefinition = settingsSectionDefinition()
+		self.sections = [actionsSection, infoSection, settingsSection]
 	}
 
 }
@@ -481,7 +542,7 @@ extension HomeViewController {
 	}
 
 	func reloadActionSection() {
-		sections[0] = setupActionSectionDefinition()
+		sections[0] = actionSectionDefinition()
 		reloadData(animatingDifferences: false)
 	}
 }
@@ -577,76 +638,6 @@ extension HomeViewController {
 			self.showExposureSubmission(with: self.testResult)
 		}
 		return configurator
-	}
-
-	func setupActiveConfigurator() -> HomeActivateCellConfigurator {
-		return HomeActivateCellConfigurator(state: state.enState)
-	}
-
-	func setupActionConfigurators() -> [CollectionViewCellConfiguratorAny] {
-		var actionsConfigurators: [CollectionViewCellConfiguratorAny] = []
-
-		// MARK: - Add cards that are always shown.
-
-		// Active card.
-		activeConfigurator = setupActiveConfigurator()
-		actionsConfigurators.append(activeConfigurator)
-
-		// MARK: - Add cards depending on result state.
-
-		if store.lastSuccessfulSubmitDiagnosisKeyTimestamp != nil {
-			// This is shown when we submitted keys! (Positive test result + actually decided to submit keys.)
-			// Once this state is reached, it cannot be left anymore.
-
-			let thankYou = HomeThankYouRiskCellConfigurator()
-			actionsConfigurators.append(thankYou)
-			log(message: "Reached end of life state.", file: #file, line: #line, function: #function)
-
-		} else if store.registrationToken != nil {
-			// This is shown when we registered a test.
-			// Note that the `positive` state has a custom cell and the risk cell will not be shown once the user was tested positive.
-
-			switch self.testResult {
-			case .none:
-				// Risk card.
-				if let risk = setupRiskConfigurator() {
-					actionsConfigurators.append(risk)
-				}
-
-				// Loading card.
-				let testResultLoadingCellConfigurator = HomeTestResultLoadingCellConfigurator()
-				actionsConfigurators.append(testResultLoadingCellConfigurator)
-
-			case .positive:
-				let findingPositiveRiskCellConfigurator = setupFindingPositiveRiskCellConfigurator()
-				actionsConfigurators.append(findingPositiveRiskCellConfigurator)
-
-			default:
-				// Risk card.
-				if let risk = setupRiskConfigurator() {
-					actionsConfigurators.append(risk)
-				}
-
-				let testResultConfigurator = setupTestResultConfigurator()
-				actionsConfigurators.append(testResultConfigurator)
-			}
-		} else {
-			// This is the default view that is shown when no test results are available and nothing has been submitted.
-
-			// Risk card.
-			if let risk = setupRiskConfigurator() {
-				actionsConfigurators.append(risk)
-			}
-
-			let submitCellConfigurator = setupSubmitConfigurator()
-			actionsConfigurators.append(submitCellConfigurator)
-		}
-
-		return actionsConfigurators
-	}
-
-	private func setupActionSectionDefinition() -> SectionDefinition {
-		return (.actions, setupActionConfigurators())
 	}
 }
 
