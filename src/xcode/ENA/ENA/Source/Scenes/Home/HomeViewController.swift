@@ -18,19 +18,6 @@
 import ExposureNotification
 import UIKit
 
-protocol HomeViewControllerDelegate: AnyObject {
-	func showRiskLegend()
-	func showExposureNotificationSetting(enState: ENStateHandler.State)
-	func showExposureDetection(state: HomeViewController.State, isRequestRiskRunning: Bool)
-	func setExposureDetectionState(state: HomeViewController.State, isRequestRiskRunning: Bool)
-	func showExposureSubmission(with result: TestResult?)
-	func showInviteFriends()
-	func showWebPage(from viewController: UIViewController, urlString: String)
-	func showAppInformation()
-	func showSettings(enState: ENStateHandler.State)
-	func addToUpdatingSetIfNeeded(_ anyObject: AnyObject?)
-}
-
 final class HomeViewController: UIViewController {
 
 	// MARK: Properties
@@ -57,7 +44,6 @@ final class HomeViewController: UIViewController {
 	private(set) var testResult: TestResult?
 
 
-
 	// MARK: Creating a Home View Controller
 	init?(
 		coder: NSCoder,
@@ -69,25 +55,15 @@ final class HomeViewController: UIViewController {
 		exposureSubmissionService: ExposureSubmissionService
 	) {
 		self.delegate = delegate
-		//self.enState = initialEnState
 		self.exposureSubmissionService = exposureSubmissionService
-		self.state = State(detectionMode: detectionMode,
-						   exposureManagerState: exposureManagerState,
-						   enState: initialEnState,
-						   risk: risk)
+		self.state = State(
+			detectionMode: detectionMode,
+			exposureManagerState: exposureManagerState,
+			enState: initialEnState,
+			risk: risk)
 		super.init(coder: coder)
-		/*self.homeInteractor = HomeInteractor(
-			homeViewController: self,
-			state: .init(
-				detectionMode: detectionMode,
-				exposureManagerState: exposureManagerState,
-				enState: initialEnState,
-				risk: risk
-			), exposureSubmissionService: exposureSubmissionService)*/
-
 		navigationItem.largeTitleDisplayMode = .never
-		// TODO: Uncomment me again.
-		// delegate.addToUpdatingSetIfNeeded(homeInteractor)
+		delegate.addToUpdatingSetIfNeeded(self)
 	}
 
 	@available(*, unavailable)
