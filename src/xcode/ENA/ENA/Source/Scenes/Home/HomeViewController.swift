@@ -73,7 +73,7 @@ final class HomeViewController: UIViewController {
 
 	// MARK: Properties
 
-	private var sections: SectionConfiguration = []
+	private var sectionConfigurations: SectionConfiguration = []
 	private var dataSource: UICollectionViewDiffableDataSource<Section, AnyHashable>?
 	private var collectionView: UICollectionView! { view as? UICollectionView }
 
@@ -212,7 +212,7 @@ final class HomeViewController: UIViewController {
 	func reloadCell(at indexPath: IndexPath) {
 		guard let snapshot = dataSource?.snapshot() else { return }
 		guard let cell = collectionView.cellForItem(at: indexPath) else { return }
-		sections[indexPath.section].cellConfigurators[indexPath.item].configureAny(cell: cell)
+		sectionConfigurations[indexPath.section].cellConfigurators[indexPath.item].configureAny(cell: cell)
 		dataSource?.apply(snapshot, animatingDifferences: true)
 	}
 
@@ -242,7 +242,7 @@ final class HomeViewController: UIViewController {
 
 	private func configureDataSource() {
 		dataSource = UICollectionViewDiffableDataSource<Section, AnyHashable>(collectionView: collectionView) { [unowned self] collectionView, indexPath, _ in
-			let configurator = self.sections[indexPath.section].cellConfigurators[indexPath.row]
+			let configurator = self.sectionConfigurations[indexPath.section].cellConfigurators[indexPath.row]
 			let cell = collectionView.dequeueReusableCell(cellType: configurator.viewAnyType, for: indexPath)
 			cell.unhighlight()
 			configurator.configureAny(cell: cell)
@@ -252,9 +252,9 @@ final class HomeViewController: UIViewController {
 
 	func applySnapshotFromSections(animatingDifferences: Bool = false) {
 		var snapshot = NSDiffableDataSourceSnapshot<Section, AnyHashable>()
-		for section in sections {
-			snapshot.appendSections([section.section])
-			snapshot.appendItems( section.cellConfigurators.map { $0.hashValue })
+		for sectionConfiguration in sectionConfigurations {
+			snapshot.appendSections([sectionConfiguration.section])
+			snapshot.appendItems(sectionConfiguration.cellConfigurators.map { $0.hashValue })
 		}
 		dataSource?.apply(snapshot, animatingDifferences: animatingDifferences)
 	}
@@ -507,7 +507,7 @@ extension HomeViewController: RequiresAppDependencies {
 		let actionsSection: SectionDefinition = actionSectionDefinition()
 		let infoSection: SectionDefinition = infoSectionDefinition()
 		let settingsSection: SectionDefinition = settingsSectionDefinition()
-		self.sections = [actionsSection, infoSection, settingsSection]
+		self.sectionConfigurations = [actionsSection, infoSection, settingsSection]
 	}
 
 }
@@ -542,7 +542,7 @@ extension HomeViewController {
 	}
 
 	func reloadActionSection() {
-		sections[0] = actionSectionDefinition()
+		sectionConfigurations[0] = actionSectionDefinition()
 		reloadData(animatingDifferences: false)
 	}
 }
@@ -646,7 +646,7 @@ extension HomeViewController {
 extension HomeViewController {
 
 	private func indexPathForRiskCell() -> IndexPath? {
-		for section in sections {
+		for section in sectionConfigurations {
 			let index = section.cellConfigurators.firstIndex { cellConfigurator in
 				cellConfigurator === self.riskLevelConfigurator
 			}
@@ -658,7 +658,7 @@ extension HomeViewController {
 	}
 
 	private func indexPathForActiveCell() -> IndexPath? {
-		for section in sections {
+		for section in sectionConfigurations {
 			let index = section.cellConfigurators.firstIndex { cellConfigurator in
 				cellConfigurator === self.activeConfigurator
 			}
@@ -670,7 +670,7 @@ extension HomeViewController {
 	}
 
 	private func indexPathForTestResultCell() -> IndexPath? {
-		let section = sections.first
+		let section = sectionConfigurations.first
 		let index = section?.cellConfigurators.firstIndex { cellConfigurator in
 			cellConfigurator === self.testResultConfigurator
 		}
