@@ -20,7 +20,17 @@ import UIKit
 
 final class HomeViewController: UIViewController {
 
-	// MARK: Properties
+	// MARK: - View-related properties.
+
+	private var sectionConfigurations: SectionConfiguration = []
+	private var dataSource: UICollectionViewDiffableDataSource<Section, AnyHashable>?
+	private var collectionView: UICollectionView! { view as? UICollectionView }
+
+	// MARK: - Delegate
+
+	private weak var delegate: HomeViewControllerDelegate?
+
+	// MARK: - State-bound properties.
 	var state: State {
 		didSet {
 			setStateOfChildViewControllers()
@@ -28,12 +38,11 @@ final class HomeViewController: UIViewController {
 			setupSections()
 		}
 	}
-
 	private(set) var isRequestRiskRunning = false
-	private let exposureSubmissionService: ExposureSubmissionService
 	var enStateHandler: ENStateHandler?
-
 	private var detectionMode: DetectionMode { state.detectionMode }
+
+	// MARK: Configurators.
 
 	private var activeConfigurator: HomeActivateCellConfigurator!
 	private var testResultConfigurator = HomeTestResultCellConfigurator()
@@ -42,6 +51,7 @@ final class HomeViewController: UIViewController {
 	private var countdownTimer: CountdownTimer?
 
 	private(set) var testResult: TestResult?
+	private let exposureSubmissionService: ExposureSubmissionService
 
 
 	// MARK: Creating a Home View Controller
@@ -69,20 +79,6 @@ final class HomeViewController: UIViewController {
 	@available(*, unavailable)
 	required init?(coder _: NSCoder) {
 		fatalError("init(coder:) has intentionally not been implemented")
-	}
-
-	// MARK: Properties
-
-	private var sectionConfigurations: SectionConfiguration = []
-	private var dataSource: UICollectionViewDiffableDataSource<Section, AnyHashable>?
-	private var collectionView: UICollectionView! { view as? UICollectionView }
-
-	private weak var delegate: HomeViewControllerDelegate?
-
-	enum Section: Int {
-		case actions
-		case infos
-		case settings
 	}
 
 	// MARK: UIViewController
@@ -260,11 +256,7 @@ final class HomeViewController: UIViewController {
 	}
 
 	private func updateBackgroundColor() {
-		if traitCollection.userInterfaceStyle == .light {
-			collectionView.backgroundColor = .enaColor(for: .background)
-		} else {
-			collectionView.backgroundColor = .enaColor(for: .separator)
-		}
+		collectionView.backgroundColor = .backgroundColor(for: traitCollection.userInterfaceStyle)
 	}
 
 	func cellForItem(at indexPath: IndexPath) -> UICollectionViewCell? {
@@ -550,14 +542,12 @@ extension HomeViewController {
 // MARK: - Action section setup helpers.
 
 extension HomeViewController {
-	private var risk: Risk? { state.risk }
-	private var riskDetails: Risk.Details? { risk?.details }
 
 	// swiftlint:disable:next function_body_length
 	func setupRiskConfigurator() -> CollectionViewCellConfiguratorAny? {
 
 		let detectionIsAutomatic = detectionMode == .automatic
-		let dateLastExposureDetection = riskDetails?.exposureDetectionDate
+		let dateLastExposureDetection = state.risk?.details.exposureDetectionDate
 
 		riskLevelConfigurator = nil
 		inactiveConfigurator = nil
@@ -766,3 +756,10 @@ extension HomeViewController: CountdownTimerDelegate {
 	}
 }
 
+extension HomeViewController {
+	enum Section: Int {
+		case actions
+		case infos
+		case settings
+	}
+}
