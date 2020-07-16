@@ -52,7 +52,7 @@ final class HomeViewController: UIViewController {
 	private(set) var testResult: TestResult?
 	private let exposureSubmissionService: ExposureSubmissionService
 
-	// MARK: - Creating a Home View Controller
+	// MARK: - Init.
 
 	init?(
 		coder: NSCoder,
@@ -80,7 +80,7 @@ final class HomeViewController: UIViewController {
 		fatalError("init(coder:) has intentionally not been implemented")
 	}
 
-	// MARK: UIViewController
+	// MARK: View lifecycle methods.
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -99,6 +99,12 @@ final class HomeViewController: UIViewController {
 		updateTestResults()
 		updateRisk(userInitiated: false)
 		updateBackgroundColor()
+	}
+
+	// MARK: - UI-related helper methods.
+
+	private func updateBackgroundColor() {
+		collectionView.backgroundColor = .backgroundColor(for: traitCollection.userInterfaceStyle)
 	}
 
 	override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -136,10 +142,6 @@ final class HomeViewController: UIViewController {
 		state.risk = risk
 
 		reloadData(animatingDifferences: false)
-	}
-
-	func showExposureSubmissionWithoutResult() {
-		showExposureSubmission()
 	}
 
 	func showExposureSubmission(with result: TestResult? = nil) {
@@ -253,10 +255,6 @@ final class HomeViewController: UIViewController {
 		dataSource?.apply(snapshot, animatingDifferences: animatingDifferences)
 	}
 
-	private func updateBackgroundColor() {
-		collectionView.backgroundColor = .backgroundColor(for: traitCollection.userInterfaceStyle)
-	}
-
 	func cellForItem(at indexPath: IndexPath) -> UICollectionViewCell? {
 		return self.collectionView.cellForItem(at: indexPath)
 	}
@@ -314,7 +312,6 @@ extension HomeViewController: ENStateHandlerUpdating {
 	func updateEnState(_ state: ENStateHandler.State) {
 		self.state.enState = state
 		activeConfigurator.updateEnState(state)
-		updateActiveCell()
 		reloadData(animatingDifferences: false)
 	}
 }
@@ -349,11 +346,11 @@ extension HomeViewController: RequiresAppDependencies {
 	typealias SectionDefinition = (section: HomeViewController.Section, cellConfigurators: [CollectionViewCellConfiguratorAny])
 	typealias SectionConfiguration = [SectionDefinition]
 
-	private func updateActiveCell() {
+	/* private func updateActiveCell() {
 		guard let indexPath = indexPathForActiveCell() else { return }
 		// homeViewController.updateSections()
 		reloadCell(at: indexPath)
-	}
+	} */
 
 	private func updateRiskButton(isEnabled: Bool) {
 		riskLevelConfigurator?.updateButtonEnabled(isEnabled)
@@ -613,7 +610,8 @@ extension HomeViewController {
 
 	func setupSubmitConfigurator() -> HomeTestResultCellConfigurator {
 		let submitConfigurator = HomeTestResultCellConfigurator()
-		submitConfigurator.primaryAction = showExposureSubmissionWithoutResult
+		submitConfigurator.primaryAction = { self.showExposureSubmission() }
+		// submitConfigurator.primaryAction = showExposureSubmissionWithoutResult
 		return submitConfigurator
 	}
 
@@ -741,6 +739,9 @@ extension HomeViewController: CountdownTimerDelegate {
 		self.reloadActionSection()
 	}
 
+
+	/// Updates the countdown time continously. Note that we do __not__ make use of the diffable data source
+	/// here because the entire cell would be reloaded every second.
 	func countdownTimer(_ timer: CountdownTimer, didUpdate time: String) {
 		guard let indexPath = self.indexPathForRiskCell() else { return }
 		guard let cell = cellForItem(at: indexPath) as? RiskLevelCollectionViewCell else { return }
