@@ -91,7 +91,6 @@ final class HomeViewController: UIViewController {
 		setupSections()
 		// updateSections()
 		applySnapshotFromSections()
-
 		setStateOfChildViewControllers()
 	}
 
@@ -362,12 +361,6 @@ extension HomeViewController: RequiresAppDependencies {
 
 	private func updateRiskButton(isHidden: Bool) {
 		riskLevelConfigurator?.updateButtonHidden(isHidden)
-	}
-
-	private func reloadRiskCell() {
-		guard let indexPath = indexPathForRiskCell() else { return }
-		// homeViewController.updateSections()
-		reloadCell(at: indexPath)
 	}
 
 	/// Adjusts the risk configurator in a way that the cell is automatically
@@ -755,13 +748,5 @@ extension HomeViewController: CountdownTimerDelegate {
 		// We pass the time and let the configurator decide whether the button can be activated or not.
 		riskLevelConfigurator?.timeUntilUpdate = time
 		riskLevelConfigurator?.configureButton(for: cell)
-	}
-}
-
-extension HomeViewController {
-	enum Section: Int {
-		case actions
-		case infos
-		case settings
 	}
 }

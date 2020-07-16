@@ -43,6 +43,7 @@
 		2F26CE2E248B9C4F00BE30EE /* UIViewController+BackButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F26CE2D248B9C4F00BE30EE /* UIViewController+BackButton.swift */; };
 		2F3218D0248063E300A7AC0A /* UIView+Convenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3218CF248063E300A7AC0A /* UIView+Convenience.swift */; };
 		2F32F30D24C068A500F645EA /* UIColor-BackgroundColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F32F30C24C068A500F645EA /* UIColor-BackgroundColor.swift */; };
+		2F32F30F24C094BC00F645EA /* HomeViewController+Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F32F30E24C094BC00F645EA /* HomeViewController+Section.swift */; };
 		2F4FAFEA24BDEC0000BE1227 /* HomeViewControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FAFE924BDEC0000BE1227 /* HomeViewControllerDelegate.swift */; };
 		2F785752248506BD00323A9C /* HomeTestResultCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2F78574F248506BD00323A9C /* HomeTestResultCollectionViewCell.xib */; };
 		2F80CFD9247ED988000F06AF /* ExposureSubmissionIntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F80CFD8247ED988000F06AF /* ExposureSubmissionIntroViewController.swift */; };
@@ -443,6 +444,7 @@
 		2F26CE2D248B9C4F00BE30EE /* UIViewController+BackButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+BackButton.swift"; sourceTree = "<group>"; };
 		2F3218CF248063E300A7AC0A /* UIView+Convenience.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+Convenience.swift"; sourceTree = "<group>"; };
 		2F32F30C24C068A500F645EA /* UIColor-BackgroundColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor-BackgroundColor.swift"; sourceTree = "<group>"; };
+		2F32F30E24C094BC00F645EA /* HomeViewController+Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeViewController+Section.swift"; sourceTree = "<group>"; };
 		2F4FAFE924BDEC0000BE1227 /* HomeViewControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewControllerDelegate.swift; sourceTree = "<group>"; };
 		2F78574F248506BD00323A9C /* HomeTestResultCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HomeTestResultCollectionViewCell.xib; sourceTree = "<group>"; };
 		2F80CFD8247ED988000F06AF /* ExposureSubmissionIntroViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExposureSubmissionIntroViewController.swift; sourceTree = "<group>"; };
@@ -1149,6 +1151,7 @@
 				5111E7622460BB1500ED6498 /* HomeInteractor.swift */,
 				51CE1B5424604DD2002CF42A /* HomeLayout.swift */,
 				2F4FAFE924BDEC0000BE1227 /* HomeViewControllerDelegate.swift */,
+				2F32F30E24C094BC00F645EA /* HomeViewController+Section.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -2398,6 +2401,7 @@
 				2F80CFDB247EDDB3000F06AF /* ExposureSubmissionHotlineViewController.swift in Sources */,
 				2F80CFD9247ED988000F06AF /* ExposureSubmissionIntroViewController.swift in Sources */,
 				A3C4F96024812CD20047F23E /* ExposureSubmissionWarnOthersViewController.swift in Sources */,
+				2F32F30F24C094BC00F645EA /* HomeViewController+Section.swift in Sources */,
 				B1741B582462EBDB006275D9 /* HomeViewController.swift in Sources */,
 				3DD767462483D4DE002DD2B3 /* ReachabilityService.swift in Sources */,
 				71EF33D92497F3E8007B7E1B /* ENANavigationControllerWithFooterChild.swift in Sources */,
