@@ -370,12 +370,20 @@ extension HomeViewController: RequiresAppDependencies {
 		reloadCell(at: indexPath)
 	}
 
+	/// Adjusts the risk configurator in a way that the cell is automatically
+	/// reloaded by the diffable data source.
+	/// - Parameter isLoading: denotes whether the risk cell
+	/// is currently in a loading state (i.e. having a spinner) or not.
 	func updateRiskCell(isLoading: Bool) {
 		self.isRequestRiskRunning = isLoading
 		riskLevelConfigurator?.isLoading = isLoading
 		applySnapshotFromSections()
 	}
 
+	/// This method updates / checks for the current risk level.
+	/// - Parameter userInitiated: If the user has tapped on the button in the home screen
+	/// (i.e. requested to update the risk manually), `userInitiated` is set to `true`.
+	/// if it was triggered from a background task, it would be `false`.
 	func updateRisk(userInitiated: Bool) {
 		if userInitiated {
 			updateRiskCell(isLoading: true)
