@@ -40,9 +40,8 @@ final class HomeViewController: UIViewController {
 	}
 	private(set) var isRequestRiskRunning = false
 	var enStateHandler: ENStateHandler?
-	private var detectionMode: DetectionMode { state.detectionMode }
 
-	// MARK: Configurators.
+	// MARK: - Configurators.
 
 	private var activeConfigurator: HomeActivateCellConfigurator!
 	private var testResultConfigurator = HomeTestResultCellConfigurator()
@@ -53,8 +52,8 @@ final class HomeViewController: UIViewController {
 	private(set) var testResult: TestResult?
 	private let exposureSubmissionService: ExposureSubmissionService
 
+	// MARK: - Creating a Home View Controller
 
-	// MARK: Creating a Home View Controller
 	init?(
 		coder: NSCoder,
 		delegate: HomeViewControllerDelegate,
@@ -99,7 +98,7 @@ final class HomeViewController: UIViewController {
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		updateTestResults()
-		requestRisk(userInitiated: false)
+		updateRisk(userInitiated: false)
 		updateBackgroundColor()
 	}
 
@@ -357,10 +356,6 @@ extension HomeViewController: RequiresAppDependencies {
 		reloadCell(at: indexPath)
 	}
 
-	private func updateRiskLoading() {
-		isRequestRiskRunning ? riskLevelConfigurator?.startLoading() : riskLevelConfigurator?.stopLoading()
-	}
-
 	private func updateRiskButton(isEnabled: Bool) {
 		riskLevelConfigurator?.updateButtonEnabled(isEnabled)
 	}
@@ -375,18 +370,17 @@ extension HomeViewController: RequiresAppDependencies {
 		reloadCell(at: indexPath)
 	}
 
-	func updateAndReloadRiskLoading(isRequestRiskRunning: Bool) {
-		self.isRequestRiskRunning = isRequestRiskRunning
-		updateRiskLoading()
-		reloadRiskCell()
+	func updateRiskCell(isLoading: Bool) {
+		self.isRequestRiskRunning = isLoading
+		riskLevelConfigurator?.isLoading = isLoading
+		applySnapshotFromSections()
 	}
 
-	func requestRisk(userInitiated: Bool) {
-
+	func updateRisk(userInitiated: Bool) {
 		if userInitiated {
-			updateAndReloadRiskLoading(isRequestRiskRunning: true)
+			updateRiskCell(isLoading: true)
 			riskProvider.requestRisk(userInitiated: userInitiated) { _ in
-				self.updateAndReloadRiskLoading(isRequestRiskRunning: false)
+				self.updateRiskCell(isLoading: false)
 			}
 		} else {
 			riskProvider.requestRisk(userInitiated: userInitiated)
@@ -546,7 +540,7 @@ extension HomeViewController {
 	// swiftlint:disable:next function_body_length
 	func setupRiskConfigurator() -> CollectionViewCellConfiguratorAny? {
 
-		let detectionIsAutomatic = detectionMode == .automatic
+		let detectionIsAutomatic = state.detectionMode == .automatic
 		let dateLastExposureDetection = state.risk?.details.exposureDetectionDate
 
 		riskLevelConfigurator = nil
@@ -562,7 +556,7 @@ extension HomeViewController {
 				isLoading: false,
 				lastUpdateDate: nil,
 				detectionInterval: detectionInterval,
-				detectionMode: detectionMode,
+				detectionMode: state.detectionMode,
 				manualExposureDetectionState: riskProvider.manualExposureDetectionState
 			)
 		case .inactive:
@@ -588,7 +582,7 @@ extension HomeViewController {
 				totalDays: 14,
 				lastUpdateDate: dateLastExposureDetection,
 				isButtonHidden: detectionIsAutomatic,
-				detectionMode: detectionMode,
+				detectionMode: state.detectionMode,
 				manualExposureDetectionState: riskProvider.manualExposureDetectionState,
 				detectionInterval: detectionInterval
 			)
@@ -598,7 +592,7 @@ extension HomeViewController {
 				daysSinceLastExposure: state.daysSinceLastExposure,
 				lastUpdateDate: dateLastExposureDetection,
 				manualExposureDetectionState: riskProvider.manualExposureDetectionState,
-				detectionMode: detectionMode,
+				detectionMode: state.detectionMode,
 				validityDuration: detectionInterval
 			)
 		case .none:
@@ -606,7 +600,7 @@ extension HomeViewController {
 		}
 
 		riskLevelConfigurator?.buttonAction = {
-			self.requestRisk(userInitiated: true)
+			self.updateRisk(userInitiated: true)
 		}
 		return riskLevelConfigurator ?? inactiveConfigurator
 	}
@@ -721,7 +715,7 @@ extension HomeViewController {
 /// The `CountdownTimerDelegate` is used to update the remaining time that is shown on the risk cell button until a manual refresh is allowed.
 extension HomeViewController: CountdownTimerDelegate {
 	private func scheduleCountdownTimer() {
-		guard self.detectionMode == .manual else { return }
+		guard self.state.detectionMode == .manual else { return }
 
 		// Cleanup potentially existing countdown.
 		countdownTimer?.invalidate()

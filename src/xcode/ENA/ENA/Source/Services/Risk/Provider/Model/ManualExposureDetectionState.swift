@@ -17,7 +17,7 @@
 // under the License.
 //
 
-/// If the risk provider is running in manual mode then the manual exposure detection state tells you whether or not requestRisk(…) will trigger an exposure detection when called.
+/// If the risk provider is running in manual mode then the manual exposure detection state tells you whether or not updateRisk(…) will trigger an exposure detection when called.
 enum ManualExposureDetectionState {
 	/// If the state is `possible` then calling requestRisk(…) will trigger an exposure detection when called.
 	case possible
