@@ -28,7 +28,7 @@ final class HomeViewController: UIViewController {
 
 	// MARK: - Delegate
 
-	private weak var delegate: HomeViewControllerDelegate?
+	private weak var coordinator: HomeViewControllerDelegate?
 
 	// MARK: - State-bound properties.
 	var state: State {
@@ -63,7 +63,7 @@ final class HomeViewController: UIViewController {
 		risk: Risk?,
 		exposureSubmissionService: ExposureSubmissionService
 	) {
-		self.delegate = delegate
+		self.coordinator = delegate
 		self.exposureSubmissionService = exposureSubmissionService
 		self.state = State(
 			detectionMode: detectionMode,
@@ -126,14 +126,14 @@ final class HomeViewController: UIViewController {
 	// MARK: Actions
 
 	@IBAction private func infoButtonTapped() {
-		delegate?.showRiskLegend()
+		coordinator?.showRiskLegend()
 	}
 
 	// MARK: Misc
 
 	// Called by HomeInteractor
 	func setStateOfChildViewControllers() {
-		delegate?.setExposureDetectionState(state: state, isRequestRiskRunning: isRequestRiskRunning)
+		coordinator?.setExposureDetectionState(state: state, isRequestRiskRunning: isRequestRiskRunning)
 	}
 
 	func updateState(detectionMode: DetectionMode, exposureManagerState: ExposureManagerState, risk: Risk?) {
@@ -144,31 +144,15 @@ final class HomeViewController: UIViewController {
 		reloadData(animatingDifferences: false)
 	}
 
-	func showExposureSubmission(with result: TestResult? = nil) {
-		delegate?.showExposureSubmission(with: result)
-	}
-
-	func showExposureNotificationSetting() {
-		delegate?.showExposureNotificationSetting(enState: state.enState)
-	}
-
-	func showExposureDetection() {
-		delegate?.showExposureDetection(state: state, isRequestRiskRunning: isRequestRiskRunning)
-	}
-
 	private func showScreenForActionSectionForCell(at indexPath: IndexPath) {
 		let cell = collectionView.cellForItem(at: indexPath)
 		switch cell {
 		case is ActivateCollectionViewCell:
-			showExposureNotificationSetting()
-		case is RiskLevelCollectionViewCell:
-		 	showExposureDetection()
-		case is RiskFindingPositiveCollectionViewCell:
-			showExposureSubmission(with: testResult)
-		case is HomeTestResultCollectionViewCell:
-			showExposureSubmission(with: testResult)
-		case is RiskInactiveCollectionViewCell:
-			showExposureDetection()
+			coordinator?.showExposureNotificationSetting(enState: state.enState)
+		case is RiskLevelCollectionViewCell, is RiskInactiveCollectionViewCell:
+		 	coordinator?.showExposureDetection(state: state, isRequestRiskRunning: isRequestRiskRunning)
+		case is RiskFindingPositiveCollectionViewCell, is HomeTestResultCollectionViewCell:
+			coordinator?.showExposureSubmission(with: testResult)
 		case is RiskThankYouCollectionViewCell:
 			return
 		default:
@@ -185,15 +169,15 @@ final class HomeViewController: UIViewController {
 			showScreenForActionSectionForCell(at: indexPath)
 		case .infos:
 			if row == 0 {
-				delegate?.showInviteFriends()
+				coordinator?.showInviteFriends()
 			} else {
-				delegate?.showWebPage(from: self, urlString: AppStrings.SafariView.targetURL)
+				coordinator?.showWebPage(from: self, urlString: AppStrings.SafariView.targetURL)
 			}
 		case .settings:
 			if row == 0 {
-				delegate?.showAppInformation()
+				coordinator?.showAppInformation()
 			} else {
-				delegate?.showSettings(enState: state.enState)
+				coordinator?.showSettings(enState: state.enState)
 			}
 		}
 	}
@@ -264,7 +248,7 @@ final class HomeViewController: UIViewController {
 
 extension HomeViewController {
 	func showTestResultScreen() {
-		showExposureSubmission(with: testResult)
+		coordinator?.showExposureSubmission(with: testResult)
 	}
 
 	func updateTestResultState() {
@@ -610,7 +594,7 @@ extension HomeViewController {
 
 	func setupSubmitConfigurator() -> HomeTestResultCellConfigurator {
 		let submitConfigurator = HomeTestResultCellConfigurator()
-		submitConfigurator.primaryAction = { self.showExposureSubmission() }
+		submitConfigurator.primaryAction = { self.coordinator?.showExposureSubmission(with: nil) }
 		// submitConfigurator.primaryAction = showExposureSubmissionWithoutResult
 		return submitConfigurator
 	}
@@ -618,7 +602,7 @@ extension HomeViewController {
 	func setupFindingPositiveRiskCellConfigurator() -> HomeFindingPositiveRiskCellConfigurator {
 		let configurator = HomeFindingPositiveRiskCellConfigurator()
 		configurator.nextAction = {
-			self.showExposureSubmission(with: self.testResult)
+			self.coordinator?.showExposureSubmission(with: self.testResult)
 		}
 		return configurator
 	}
@@ -705,7 +689,7 @@ extension HomeViewController {
 
 extension HomeViewController {
 	private func inActiveCellActionHandler() {
-		showExposureNotificationSetting()
+		self.coordinator?.showExposureNotificationSetting(enState: state.enState)
 	}
 }
 
