@@ -189,12 +189,12 @@ final class HomeViewController: UIViewController {
 		applySnapshotFromSections(animatingDifferences: animatingDifferences)
 	}
 
-	func reloadCell(at indexPath: IndexPath) {
+	/*func reloadCell(at indexPath: IndexPath) {
 		guard let snapshot = dataSource?.snapshot() else { return }
 		guard let cell = collectionView.cellForItem(at: indexPath) else { return }
 		sectionConfigurations[indexPath.section].cellConfigurators[indexPath.item].configureAny(cell: cell)
 		dataSource?.apply(snapshot, animatingDifferences: true)
-	}
+	}*/
 
 	private func configureCollectionView() {
 		collectionView.collectionViewLayout = .homeLayout(delegate: self)
@@ -335,14 +335,6 @@ extension HomeViewController: RequiresAppDependencies {
 		// homeViewController.updateSections()
 		reloadCell(at: indexPath)
 	} */
-
-	private func updateRiskButton(isEnabled: Bool) {
-		riskLevelConfigurator?.updateButtonEnabled(isEnabled)
-	}
-
-	private func updateRiskButton(isHidden: Bool) {
-		riskLevelConfigurator?.updateButtonHidden(isHidden)
-	}
 
 	/// Adjusts the risk configurator in a way that the cell is automatically
 	/// reloaded by the diffable data source.
@@ -505,8 +497,8 @@ extension HomeViewController {
 	private func reloadTestResult(with result: TestResult) {
 		testResultConfigurator.testResult = result
 		reloadActionSection()
-		guard let indexPath = indexPathForTestResultCell() else { return }
-		reloadCell(at: indexPath)
+		// guard let indexPath = indexPathForTestResultCell() else { return }
+		// reloadCell(at: indexPath)
 	}
 
 	func reloadActionSection() {
