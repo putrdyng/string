@@ -65,6 +65,15 @@ final class ENATaskScheduler {
 				task.setTaskCompleted(success: false)
 			}
 		}
+
+		// Add in local notifications for debugging.
+		showNotification(
+			title: "registerTask() called.",
+			subtitle: "\(Date())",
+			body: "Task identifier: \(identifierString)",
+			notificationIdentifier: "registerTask(taskIdentifier: \(identifierString)"
+		)
+
 	}
 
 	func scheduleTasks() {
@@ -110,6 +119,15 @@ final class ENATaskScheduler {
 
 	// Task Handlers:
 	private func executeExposureDetectionRequest(_ task: BGTask) {
+
+		// Add in local notifications for debugging.
+		showNotification(
+			title: "executeExposureDetectionRequest() called.",
+			subtitle: "\(Date())",
+			body: "Task identifier: \(task.identifier)",
+			notificationIdentifier: task.identifier
+		)
+
 		taskDelegate?.executeExposureDetectionRequest(task: task) { success in
 			task.setTaskCompleted(success: success)
 		}
@@ -117,10 +135,48 @@ final class ENATaskScheduler {
 	}
 
 	private func executeFetchTestResults(_ task: BGTask) {
+
+		// Add in local notifications for debugging.
+		showNotification(
+			title: "executeFetchTestResults() called.",
+			subtitle: "\(Date())",
+			body: "Task identifier: \(task.identifier)",
+			notificationIdentifier: task.identifier
+		)
+
 		taskDelegate?.executeFetchTestResults(task: task) { success in
 			task.setTaskCompleted(success: success)
 		}
 		scheduleTask(for: task.identifier)
+	}
+
+	private func showNotification(
+		title: String,
+		subtitle: String,
+		body: String,
+		notificationIdentifier: String
+	) {
+
+		let content = UNMutableNotificationContent()
+		content.title = title
+		content.subtitle = subtitle
+		content.body = body
+
+		let trigger = UNTimeIntervalNotificationTrigger(
+			timeInterval: 1,
+			repeats: false
+		)
+
+		let request = UNNotificationRequest(
+			identifier: notificationIdentifier,
+			content: content,
+			trigger: trigger
+		)
+
+		UNUserNotificationCenter.current().add(request) { error in
+			guard let error = error else { return }
+			logError(message: "There was an error scheduling the local notification. \(error.localizedDescription)")
+		}
 	}
 
 }
