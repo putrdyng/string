@@ -84,7 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	let taskScheduler: ENATaskScheduler = ENATaskScheduler.shared
 
 	lazy var riskProvider: RiskProvider = {
-		let exposureDetectionInterval = self.store.hourlyFetchingEnabled ? DateComponents(hour: 4) : DateComponents(hour: 24)
+		let exposureDetectionInterval = self.store.hourlyFetchingEnabled ? DateComponents(hour: 4) : DateComponents(hour: 4)
 
 		let config = RiskProvidingConfiguration(
 			exposureDetectionValidityDuration: DateComponents(day: 2),
