@@ -89,6 +89,7 @@ extension RiskProvider: RiskProviding {
 
 	/// Called by consumers to request the risk level. This method triggers the risk level process.
 	func requestRisk(userInitiated: Bool, completion: Completion? = nil) {
+		ENATaskScheduler.log(title: "risk requested: userInitiated: \(userInitiated)")
 		queue.async {
 			self._requestRiskLevel(userInitiated: userInitiated, completion: completion)
 		}
@@ -97,12 +98,17 @@ extension RiskProvider: RiskProviding {
 	private struct Summaries {
 		var previous: SummaryMetadata?
 		var current: SummaryMetadata?
+		var description: String {
+			"previous: \(previous?.description ?? ""), current: \(current?.description ?? "")"
+		}
 	}
 
 	private func determineSummaries(
 		userInitiated: Bool,
 		completion: @escaping (Summaries) -> Void
 	) {
+		ENATaskScheduler.log(title: "determine Summaries: userInitiated – \(userInitiated)")
+
 		// Here we are in automatic mode and thus we have to check the validity of the current summary
 		let enoughTimeHasPassed = configuration.shouldPerformExposureDetection(
 			activeTracingHours: store.tracingStatusHistory.activeTracing().inHours,
@@ -183,6 +189,8 @@ extension RiskProvider: RiskProviding {
 	#else
 
 	private func completeOnTargetQueue(risk: Risk?, completion: Completion? = nil) {
+		ENATaskScheduler.log(title: "completeOnTargetQueue: risk: \(String(describing: risk))")
+
 		targetQueue.async {
 			completion?(risk)
 		}
@@ -196,6 +204,7 @@ extension RiskProvider: RiskProviding {
 	}
 
 	private func _requestRiskLevel(userInitiated: Bool, completion: Completion? = nil) {
+		ENATaskScheduler.log(title: "started risk calculation – userInitiated: \(userInitiated) - exposureManagerState: \(exposureManagerState.description)")
 		var summaries: Summaries?
 		let tracingHistory = store.tracingStatusHistory
 		let numberOfEnabledHours = tracingHistory.activeTracing().inHours
@@ -238,14 +247,17 @@ extension RiskProvider: RiskProviding {
 
 		group.enter()
 		determineSummaries(userInitiated: userInitiated) {
+			ENATaskScheduler.log(title: "determined Summaries: \($0)")
 			summaries = $0
 			group.leave()
 		}
 
 		var appConfiguration: SAP_ApplicationConfiguration?
 		group.enter()
+		ENATaskScheduler.log(title: "determine app configuration")
 		appConfigurationProvider.appConfiguration { configuration in
 			appConfiguration = configuration
+			ENATaskScheduler.log(title: "determined app configuration: \(configuration.debugDescription)")
 			group.leave()
 		}
 
@@ -254,6 +266,7 @@ extension RiskProvider: RiskProviding {
 			completeOnTargetQueue(risk: nil, completion: completion)
 			return
 		}
+		ENATaskScheduler.log(title: "calling actual risk calculation logic with summaries: \(summaries?.description ?? ""), appConfiguration: \(appConfiguration.debugDescription)")
 
 		_requestRiskLevel(summaries: summaries, appConfiguration: appConfiguration, completion: completion)
 	}
@@ -279,6 +292,8 @@ extension RiskProvider: RiskProviding {
 				providerConfiguration: configuration
 			) else {
 				logError(message: "Serious error during risk calculation")
+				ENATaskScheduler.log(title: "Serious error during risk calculation", shouldFireNotification: true)
+
 				provideLoadingStatus(isLoading: false)
 				completeOnTargetQueue(risk: nil, completion: completion)
 				return

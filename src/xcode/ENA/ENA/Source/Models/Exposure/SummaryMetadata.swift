@@ -23,6 +23,10 @@ import ExposureNotification
 struct SummaryMetadata: Codable {
 	let summary: CodableExposureDetectionSummary
 	let date: Date
+	var description: String {
+		let encodedMetadata = try? JSONEncoder().encode(self)
+		return String(data: encodedMetadata ?? Data(), encoding: .utf8) ?? ""
+	}
 }
 
 extension SummaryMetadata {

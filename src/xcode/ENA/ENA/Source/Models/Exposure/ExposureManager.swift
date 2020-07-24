@@ -54,6 +54,10 @@ struct ExposureManagerState {
 	let enabled: Bool
 	let status: ENStatus
 	var isGood: Bool { authorized && enabled && status == .active }
+
+	var description: String {
+		"authorized: \(authorized), enabled: \(enabled), status: \(status.debugDescription), isGood: \(isGood)"
+	}
 }
 
 @objc protocol Manager: NSObjectProtocol {
