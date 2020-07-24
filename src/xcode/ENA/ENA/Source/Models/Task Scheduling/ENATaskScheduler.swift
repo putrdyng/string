@@ -114,21 +114,28 @@ final class ENATaskScheduler {
 
 	// MARK: - Util.
 
+	private static let formatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = "yyyy-MM-dd HH:mm:ss:SSS"
+		return formatter
+	}()
+
 	static func log(title: String, subtitle: String = "", body: String = "", shouldFireNotification: Bool = false) {
+		let timestamp = formatter.string(from: Date())
 		let text = "\(title) : \(subtitle) : \(body)"
-		ENATaskScheduler.logToFile(message: text)
+		ENATaskScheduler.logToFile(message: text, timestamp: timestamp)
 		print(text)
 
 		if shouldFireNotification {
-			ENATaskScheduler.showNotification(title: title, subtitle: subtitle, body: body)
+			ENATaskScheduler.showNotification(title: title, subtitle: subtitle, body: body, timestamp: timestamp)
 		}
 	}
 
-	private static func logToFile(message: String) {
+	private static func logToFile(message: String, timestamp: String) {
 		DispatchQueue.main.async {
 			let fm = FileManager.default
 			guard
-				let data = ["\(Date())", message, "\n"].joined(separator: " ").data(using: .utf8),
+				let data = [timestamp, message, "\n"].joined(separator: " ").data(using: .utf8),
 				let log = fm.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("log.txt")
 				else { return }
 			if let handle = try? FileHandle(forWritingTo: log) {
@@ -145,12 +152,13 @@ final class ENATaskScheduler {
 		title: String,
 		subtitle: String,
 		body: String,
+		timestamp: String,
 		notificationIdentifier: String = "com.sap.ios.cwa.background-test.\(UUID().uuidString)"
 	) {
 			let content = UNMutableNotificationContent()
 			content.title = title
 			content.subtitle = subtitle
-			content.body = body
+			content.body = [body, timestamp].joined(separator: "\n")
 
 			let trigger = UNTimeIntervalNotificationTrigger(
 				timeInterval: 1,
