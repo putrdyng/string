@@ -125,17 +125,19 @@ final class ENATaskScheduler {
 	}
 
 	private static func logToFile(message: String) {
-		let fm = FileManager.default
-		guard
-			let data = ["\(Date())", message, "\n"].joined(separator: " ").data(using: .utf8),
-			let log = fm.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("log.txt")
-			else { return }
-		if let handle = try? FileHandle(forWritingTo: log) {
-			handle.seekToEndOfFile()
-			handle.write(data)
-			handle.closeFile()
-		} else {
-			try? data.write(to: log)
+		DispatchQueue.main.async {
+			let fm = FileManager.default
+			guard
+				let data = ["\(Date())", message, "\n"].joined(separator: " ").data(using: .utf8),
+				let log = fm.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("log.txt")
+				else { return }
+			if let handle = try? FileHandle(forWritingTo: log) {
+				handle.seekToEndOfFile()
+				handle.write(data)
+				handle.closeFile()
+			} else {
+				try? data.write(to: log)
+			}
 		}
 	}
 
