@@ -35,8 +35,10 @@ enum KeychainHelper {
 		if deleteResult != errSecSuccess && deleteResult != errSecItemNotFound {
 			if let message = SecCopyErrorMessageString(deleteResult, nil) {
 				logError(message: "Failed to delete keychain item '\(key)' due to: \(message as String)")
+				ENATaskScheduler.log(title: "Failed to delete keychain item '\(key)' due to: \(message as String)")
 			} else {
 				logError(message: "Failed to delete keychain item '\(key)' due to unknown error")
+				ENATaskScheduler.log(title:  "Failed to delete keychain item '\(key)' due to unknown error")
 			}
 		}
 
@@ -52,8 +54,10 @@ enum KeychainHelper {
 		if addResult != errSecSuccess {
 			if let message = SecCopyErrorMessageString(addResult, nil) {
 				logError(message: "Failed to add keychain item '\(key)' due to: \(message as String)")
+				ENATaskScheduler.log(title:"Failed to add keychain item '\(key)' due to: \(message as String)")
 			} else {
 				logError(message: "Failed to add keychain item '\(key)' due to unknown error")
+				ENATaskScheduler.log(title: "Failed to add keychain item '\(key)' due to unknown error")
 			}
 		}
 
@@ -71,6 +75,8 @@ enum KeychainHelper {
 			status == errSecSuccess,
 			CFGetTypeID(dataRef) == CFDataGetTypeID() {
 			return dataRef as? Data
+		} else {
+			ENATaskScheduler.log(title: "Cannot load the item from keychain. The status is \(status)")
 		}
 		return nil
 	}

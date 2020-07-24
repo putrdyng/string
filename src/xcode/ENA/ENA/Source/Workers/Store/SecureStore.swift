@@ -204,6 +204,7 @@ extension SecureStore {
 			if !fileManager.fileExists(atPath: directoryURL.path) {
 				try fileManager.createDirectory(atPath: directoryURL.path, withIntermediateDirectories: true, attributes: nil)
 				guard let key = KeychainHelper.generateDatabaseKey() else {
+					ENATaskScheduler.log(title:"Creating the Database failed")
 					fatalError("Creating the Database failed")
 				}
 				self.init(at: directoryURL, key: key)
@@ -213,11 +214,13 @@ extension SecureStore {
 				} else if let generated = KeychainHelper.generateDatabaseKey() {
 					key = generated
 				} else {
+					ENATaskScheduler.log(title:"Cannot get or generate the key")
 					fatalError("Cannot get or generate the key")
 				}
 				self.init(at: directoryURL, key: key)
 			}
 		} catch {
+			ENATaskScheduler.log(title:"Creating the Database failed")
 			fatalError("Creating the Database failed")
 		}
 	}

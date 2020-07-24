@@ -68,6 +68,7 @@ struct SAPDownloadedPackage {
 					let signature = try? P256.Signing.ECDSASignature(derRepresentation: signatureData)
 				else {
 					logError(message: "Could not validate signature of downloaded package", level: .warning)
+					ENATaskScheduler.log(title:"Could not validate signature of downloaded package")
 					continue
 				}
 
@@ -103,9 +104,11 @@ private extension Archive {
 
 	func extractKeyPackage() throws -> SAPDownloadedPackage {
 		guard let binEntry = self["export.bin"] else {
+			ENATaskScheduler.log(title:"Bin file not found")
 			throw KeyPackageError.binNotFound
 		}
 		guard let sigEntry = self["export.sig"] else {
+			ENATaskScheduler.log(title:"sig file not found")
 			throw KeyPackageError.sigNotFound
 		}
 		return SAPDownloadedPackage(
