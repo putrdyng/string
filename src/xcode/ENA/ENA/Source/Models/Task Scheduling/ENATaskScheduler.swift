@@ -49,10 +49,11 @@ final class ENATaskScheduler {
 
 	private init() {
 		registerTask(with: .exposureNotification, execute: exposureNotificationTask(_:))
-		ENATaskScheduler.showNotification(
+		ENATaskScheduler.log(
 			title: "ENATaskScheduler",
 			subtitle: "Initialized!",
-			body: "You can now put the app in the background."
+			body: "You can now put the app in the background.",
+			shouldFireNotification: true
 		)
 	}
 
@@ -78,10 +79,11 @@ final class ENATaskScheduler {
 			taskRequest.requiresExternalPower = false
 			taskRequest.earliestBeginDate = nil
 			try BGTaskScheduler.shared.submit(taskRequest)
-			ENATaskScheduler.showNotification(
+			ENATaskScheduler.log(
 				title: "ENATaskScheduler",
-				subtitle: "Scheduled!",
-				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was submitted."
+				subtitle: "Task scheduled!",
+				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was submitted.",
+				shouldFireNotification: true
 			)
 		} catch {
 			logError(message: "ERROR: scheduleTask() could NOT submit task request: \(error)")
@@ -91,18 +93,20 @@ final class ENATaskScheduler {
 	// MARK: - Task execution handlers.
 
 	private func exposureNotificationTask(_ task: BGTask) {
-		ENATaskScheduler.showNotification(
+		ENATaskScheduler.log(
 			title: "ENATaskScheduler",
 			subtitle: "Task triggered!",
-			body: ""
+			body: "",
+			shouldFireNotification: true
 		)
 
 		delegate?.executeENABackgroundTask(task: task) { success in
 			task.setTaskCompleted(success: success)
-			ENATaskScheduler.showNotification(
+			ENATaskScheduler.log(
 				title: "ENATaskScheduler",
 				subtitle: "Task done!",
-				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was set to completed."
+				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was set to completed.",
+				shouldFireNotification: true
 			)
 			self.scheduleTask()
 		}
@@ -110,7 +114,32 @@ final class ENATaskScheduler {
 
 	// MARK: - Util.
 
-	static func showNotification(
+	static func log(title: String, subtitle: String = "", body: String = "", shouldFireNotification: Bool = false) {
+		let text = "\(title) : \(subtitle) : \(body)"
+		ENATaskScheduler.logToFile(message: text)
+		print(text)
+
+		if shouldFireNotification {
+			ENATaskScheduler.showNotification(title: title, subtitle: subtitle, body: body)
+		}
+	}
+
+	private static func logToFile(message: String) {
+		let fm = FileManager.default
+		guard
+			let data = ["\(Date())", message, "\n"].joined(separator: " ").data(using: .utf8),
+			let log = fm.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("log.txt")
+			else { return }
+		if let handle = try? FileHandle(forWritingTo: log) {
+			handle.seekToEndOfFile()
+			handle.write(data)
+			handle.closeFile()
+		} else {
+			try? data.write(to: log)
+		}
+	}
+
+	private static func showNotification(
 		title: String,
 		subtitle: String,
 		body: String,
