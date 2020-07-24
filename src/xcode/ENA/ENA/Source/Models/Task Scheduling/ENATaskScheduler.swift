@@ -49,6 +49,11 @@ final class ENATaskScheduler {
 
 	private init() {
 		registerTask(with: .exposureNotification, execute: exposureNotificationTask(_:))
+		ENATaskScheduler.showNotification(
+			title: "ENATaskScheduler",
+			subtitle: "Initialized!",
+			body: "You can now put the app in the background."
+		)
 	}
 
 	// MARK: - Task registration.
@@ -73,6 +78,11 @@ final class ENATaskScheduler {
 			taskRequest.requiresExternalPower = false
 			taskRequest.earliestBeginDate = nil
 			try BGTaskScheduler.shared.submit(taskRequest)
+			ENATaskScheduler.showNotification(
+				title: "ENATaskScheduler",
+				subtitle: "Scheduled!",
+				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was submitted."
+			)
 		} catch {
 			logError(message: "ERROR: scheduleTask() could NOT submit task request: \(error)")
 		}
@@ -81,9 +91,50 @@ final class ENATaskScheduler {
 	// MARK: - Task execution handlers.
 
 	private func exposureNotificationTask(_ task: BGTask) {
+		ENATaskScheduler.showNotification(
+			title: "ENATaskScheduler",
+			subtitle: "Task triggered!",
+			body: ""
+		)
+
 		delegate?.executeENABackgroundTask(task: task) { success in
 			task.setTaskCompleted(success: success)
+			ENATaskScheduler.showNotification(
+				title: "ENATaskScheduler",
+				subtitle: "Task done!",
+				body: "A task with the identifier \(ENATaskIdentifier.exposureNotification.backgroundTaskSchedulerIdentifier) was set to completed."
+			)
 			self.scheduleTask()
 		}
+	}
+
+	// MARK: - Util.
+
+	static func showNotification(
+		title: String,
+		subtitle: String,
+		body: String,
+		notificationIdentifier: String = "com.sap.ios.cwa.background-test.\(UUID().uuidString)"
+	) {
+			let content = UNMutableNotificationContent()
+			content.title = title
+			content.subtitle = subtitle
+			content.body = body
+
+			let trigger = UNTimeIntervalNotificationTrigger(
+				timeInterval: 1,
+				repeats: false
+			)
+
+			let request = UNNotificationRequest(
+				identifier: notificationIdentifier,
+				content: content,
+				trigger: trigger
+			)
+
+			UNUserNotificationCenter.current().add(request) { error in
+				guard let error = error else { return }
+				logError(message: "There was an error scheduling the local notification. \(error.localizedDescription)")
+			}
 	}
 }
