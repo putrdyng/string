@@ -164,10 +164,21 @@ extension AppDelegate: ENATaskExecutionDelegate {
 	func executeENABackgroundTask(task: BGTask, completion: @escaping ((Bool) -> Void)) {
 		executeFetchTestResults(task: task) { fetchTestResultSuccess in
 
+			ENATaskScheduler.log(
+				title: "Done!",
+				subtitle: "executeFetchTestResults()",
+				shouldFireNotification: true
+			)
+
 			// NOTE: We are currently fetching the test result first, and then execute
 			// the exposure detection check. Instead of implementing this behaviour in the completion handler,
 			// queues could be used as well. Due to time/resource constraints, we settled for this option.
 			self.executeExposureDetectionRequest(task: task) { exposureDetectionSuccess in
+				ENATaskScheduler.log(
+					title: "Done!",
+					subtitle: "executeExposureDetectionRequest()",
+					shouldFireNotification: true
+				)
 				completion(fetchTestResultSuccess && exposureDetectionSuccess)
 			}
 		}
@@ -178,6 +189,11 @@ extension AppDelegate: ENATaskExecutionDelegate {
 	/// NOTE: This method will always return true.
 	private func executeFetchTestResults(task: BGTask, completion: @escaping ((Bool) -> Void)) {
 
+		ENATaskScheduler.log(
+			title: "Starting...",
+			subtitle: "executeFetchTestResults()",
+			shouldFireNotification: true
+		)
 		exposureSubmissionService = ENAExposureSubmissionService(diagnosiskeyRetrieval: exposureManager, client: client, store: store)
 
 		if store.registrationToken != nil && store.testResultReceivedTimeStamp == nil {
@@ -185,6 +201,12 @@ extension AppDelegate: ENATaskExecutionDelegate {
 				switch result {
 				case .failure(let error):
 					logError(message: error.localizedDescription)
+					ENATaskScheduler.log(
+						title: "Error",
+						subtitle: "executeFetchTestResults()",
+						body: error.localizedDescription,
+						shouldFireNotification: true
+					)
 				case .success(let testResult):
 					if testResult != .pending {
 						UNUserNotificationCenter.current().presentNotification(
@@ -207,6 +229,12 @@ extension AppDelegate: ENATaskExecutionDelegate {
 	/// previous state, a local notification is shown.
 	/// NOTE: This method will always return true.
 	private func executeExposureDetectionRequest(task: BGTask, completion: @escaping ((Bool) -> Void)) {
+
+		ENATaskScheduler.log(
+			title: "Starting...",
+			subtitle: "executeExposureDetectionRequest()",
+			shouldFireNotification: true
+		)
 
 		let detectionMode = DetectionMode.fromBackgroundStatus()
 		riskProvider.configuration.detectionMode = detectionMode
