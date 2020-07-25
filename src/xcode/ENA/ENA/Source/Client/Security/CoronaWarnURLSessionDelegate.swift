@@ -56,7 +56,12 @@ extension CoronaWarnURLSessionDelegate: URLSessionDelegate {
 		didReceive challenge: URLAuthenticationChallenge,
 		completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
 	) {
-		func reject() { completionHandler(.cancelAuthenticationChallenge, /* credential */ nil) }
+		ENATaskScheduler.log(title: "🌏 Receiving authentication challenge: \(challenge)")
+
+		func reject() {
+			completionHandler(.cancelAuthenticationChallenge, /* credential */ nil)
+			ENATaskScheduler.log(title: "🚨 Rejecting url session challange \(challenge)")
+		}
 
 		#if ENABLE_WHITELIST
 		guard !checkWhitelist(for: challenge.protectionSpace.host) else {
@@ -79,7 +84,10 @@ extension CoronaWarnURLSessionDelegate: URLSessionDelegate {
 		// We discard the returned status code (OSStatus) because this is also how
 		// Apple is doing it in their official sample code – see [0] for more info.
 		SecTrustEvaluateAsyncWithError(trust, .main) { trust, isValid, error in
-			func accept() { completionHandler(.useCredential, URLCredential(trust: trust)) }
+			func accept() {
+				ENATaskScheduler.log(title: "🌏 Accepting authentication challenge: \(challenge)")
+				completionHandler(.useCredential, URLCredential(trust: trust))
+			}
 
 			guard isValid else {
 				logError(message: "Server certificate is not valid. Rejecting challenge!")
