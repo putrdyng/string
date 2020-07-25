@@ -201,10 +201,26 @@ final class HTTPClient: Client {
 				switch result {
 				case let .success(response):
 					guard response.hasAcceptableStatusCode else {
+
+						ENATaskScheduler.log(
+							title: "Error in Client:",
+							subtitle: "Received error in client.getTestResult()",
+							body: "Got server error: \(response.statusCode)",
+							shouldFireNotification: true
+						)
+
 						completeWith(.failure(.serverError(response.statusCode)))
 						return
 					}
 					guard let testResultResponseData = response.body else {
+
+						ENATaskScheduler.log(
+							title: "Error in Client:",
+							subtitle: "Received error in client.getTestResult()",
+							body: "Got server error: Invalid Response",
+							shouldFireNotification: false
+						)
+
 						completeWith(.failure(.invalidResponse))
 						logError(message: "Failed to register Device with invalid response")
 						return
@@ -216,22 +232,54 @@ final class HTTPClient: Client {
 							from: testResultResponseData
 						)
 						guard let testResult = responseDictionary["testResult"] else {
+
+							ENATaskScheduler.log(
+								title: "Error in Client:",
+								subtitle: "Received error in client.getTestResult()",
+								body: "Failed to register Device with invalid response payload structure",
+								shouldFireNotification: false
+							)
+
 							logError(message: "Failed to register Device with invalid response payload structure")
 							completeWith(.failure(.invalidResponse))
 							return
 						}
 						completeWith(.success(testResult))
 					} catch {
+
+						ENATaskScheduler.log(
+							title: "Error in Client:",
+							subtitle: "Received error in client.getTestResult()",
+							body: "Failed to register Device with invalid response payload structure",
+							shouldFireNotification: false
+						)
+
 						logError(message: "Failed to register Device with invalid response payload structure")
 						completeWith(.failure(.invalidResponse))
 					}
 				case let .failure(error):
 					completeWith(.failure(error))
+
+					ENATaskScheduler.log(
+						title: "Error in Client:",
+						subtitle: "Received error in client.getTestResult()",
+						body: "Failed to registerDevices due to error: \(error).",
+						shouldFireNotification: false
+					)
+
 					logError(message: "Failed to registerDevices due to error: \(error).")
 				}
 			}
 		} catch {
 			completeWith(.failure(.invalidResponse))
+
+			ENATaskScheduler.log(
+				title: "Error in Client:",
+				subtitle: "Received error in client.getTestResult()",
+				body: "Failed to encode data correctly.",
+				shouldFireNotification: false
+			)
+
 			return
 		}
 	}

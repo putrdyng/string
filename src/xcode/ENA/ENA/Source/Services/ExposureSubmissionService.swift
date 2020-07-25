@@ -96,7 +96,18 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 	/// received, either from the TAN or QR Code flow. After successful completion,
 	/// the timestamp of the last received test is updated.
 	func getTestResult(_ completeWith: @escaping TestResultHandler) {
+
+		ENATaskScheduler.log(title: "Started getTestResult()...")
+
 		guard let registrationToken = store.registrationToken else {
+
+			ENATaskScheduler.log(
+				title: "Error:",
+				subtitle: "No registration token found.",
+				body: "No test result found when getting test result.",
+				shouldFireNotification: true
+			)
+
 			completeWith(.failure(.noRegistrationToken))
 			return
 		}
@@ -105,11 +116,30 @@ class ENAExposureSubmissionService: ExposureSubmissionService {
 			switch result {
 			case let .failure(error):
 				completeWith(.failure(self.parseError(error)))
+				ENATaskScheduler.log(
+					title: "Error:",
+					subtitle: "Received in client.getTestResult()",
+					body: "Caught error: \(error.localizedDescription)",
+					shouldFireNotification: true
+				)
 			case let .success(testResult):
 				guard let testResult = TestResult(rawValue: testResult) else {
 					completeWith(.failure(.other("Failed to parse TestResult")))
+					ENATaskScheduler.log(
+						title: "Error:",
+						subtitle: "Error while parsing Test Result.",
+						body: "",
+						shouldFireNotification: true
+					)
 					return
 				}
+
+				ENATaskScheduler.log(
+					title: "Success:",
+					subtitle: "Received test result in client.getTestResult()",
+					body: "TestResult: \(testResult)",
+					shouldFireNotification: false
+				)
 
 				completeWith(.success(testResult))
 				if testResult != .pending {
