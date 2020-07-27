@@ -29,7 +29,15 @@ class DynamicTableViewController: UIViewController, UITableViewDataSource, UITab
 		if nil != nibName {
 			super.loadView()
 		} else {
-			view = UITableView(frame: .zero, style: .grouped)
+			let tableView = UITableView(frame: .zero, style: .grouped)
+			tableView.separatorStyle = .none
+			tableView.separatorInset = .init(top: 0, left: 15, bottom: 0, right: 0)
+			tableView.backgroundColor = .enaColor(for: .background)
+			tableView.rowHeight = UITableView.automaticDimension
+			tableView.estimatedRowHeight = UITableView.automaticDimension
+			tableView.sectionHeaderHeight = UITableView.automaticDimension
+			tableView.estimatedSectionHeaderHeight = UITableView.automaticDimension
+			view = tableView
 		}
 
 		if nil == tableView {

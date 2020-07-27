@@ -47,6 +47,7 @@ protocol ExposureSubmissionCoordinating: class {
 	func showQRScreen(qrScannerDelegate: ExposureSubmissionQRScannerDelegate)
 	func showWarnOthersScreen()
 	func showThankYouScreen()
+	func showSymptomsScreen()
 }
 
 /// This delegate allows a class to be notified for life-cycle events of the coordinator.
@@ -172,6 +173,11 @@ extension ExposureSubmissionCoordinator {
 		let vc = createSuccessViewController()
 		push(vc)
 	}
+
+	func showSymptomsScreen() {
+		let vc = createSymptomsViewController()
+		push(vc)
+	}
 }
 
 // MARK: - Creation.
@@ -238,5 +244,9 @@ extension ExposureSubmissionCoordinator {
 		AppStoryboard.exposureSubmission.initiate(viewControllerType: ExposureSubmissionSuccessViewController.self) { coder -> UIViewController? in
 			ExposureSubmissionSuccessViewController(coder: coder, coordinator: self)
 		}
+	}
+
+	private func createSymptomsViewController() -> ESSymptomsViewController {
+		return ESSymptomsViewController(coordinator: self)
 	}
 }
