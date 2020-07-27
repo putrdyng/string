@@ -44,6 +44,7 @@ class ESSymptomsViewController: DynamicTableViewController {
 		super.viewDidLoad()
 		title = "Title"
 		dynamicTableViewModel = .symptomsStartModel()
+		tableView.register(CalendarCell.self, forCellReuseIdentifier: CellReuseIdentifier.calendar.rawValue)
 	}
 }
 
@@ -55,10 +56,29 @@ private extension DynamicTableViewModel {
 					header: DynamicHeader.text("Header"),
 					cells: [
 						.body(text: "Body",
-							  accessibilityIdentifier: "TODO")
+							  accessibilityIdentifier: "TODO"),
+						.calendar()
 					]
 				)
 			)
+		}
+	}
+}
+
+extension ESSymptomsViewController {
+	enum CellReuseIdentifier: String, TableViewCellReuseIdentifiers {
+		case calendar = "calendarCell"
+	}
+}
+
+private extension DynamicCell {
+	static func calendar() -> Self {
+		.identifier(ESSymptomsViewController.CellReuseIdentifier.calendar,
+					action: .none,
+					accessoryAction: .none) { _, cell, _ in
+						guard let cell = cell as? CalendarCell else { return }
+
+						// TODO: Do some setup here.
 		}
 	}
 }
