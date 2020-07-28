@@ -56,6 +56,7 @@ final class ENATaskScheduler {
 	private func registerTask(with taskIdentifier: ENATaskIdentifier, execute: @escaping ((BGTask) -> Void)) {
 		let identifierString = taskIdentifier.backgroundTaskSchedulerIdentifier
 		BGTaskScheduler.shared.register(forTaskWithIdentifier: identifierString, using: .main) { task in
+			self.scheduleTask()
 			task.expirationHandler = {
 				task.setTaskCompleted(success: false)
 			}
@@ -83,7 +84,7 @@ final class ENATaskScheduler {
 	private func exposureNotificationTask(_ task: BGTask) {
 		delegate?.executeENABackgroundTask(task: task) { success in
 			task.setTaskCompleted(success: success)
-			self.scheduleTask()
 		}
 	}
 }
+
