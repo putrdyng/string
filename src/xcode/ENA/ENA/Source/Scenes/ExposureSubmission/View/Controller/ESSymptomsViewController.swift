@@ -25,7 +25,6 @@ class ESSymptomsViewController: DynamicTableViewController {
 	// MARK: - Attributes.
 
 	private weak var coordinator: ExposureSubmissionCoordinator?
-	private var lastSelectedIndexPath: IndexPath?
 	private var selectedOption: Options? {
 		didSet {
 			// TODO: Debug code.
@@ -58,28 +57,9 @@ class ESSymptomsViewController: DynamicTableViewController {
 	// MARK: - UITableViewDelegate methods.
 
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-		deselectLastSelectedCell()
-		selectCell(at: indexPath)
-	}
-
-	// MARK: - Option selection methods.
-
-	private func deselectLastSelectedCell() {
-		guard
-			let indexPath = lastSelectedIndexPath,
-			let lastSelectedCell = tableView.cellForRow(at: indexPath) as? ESOptionCell else
-		{ return }
-
-		lastSelectedCell.didDeselect()
-	}
-
-	private func selectCell(at indexPath: IndexPath) {
 		guard let cell = tableView.cellForRow(at: indexPath) as? ESOptionCell else { return }
-		lastSelectedIndexPath = indexPath
 		selectedOption = cell.option
-		cell.didSelect()
 	}
-
 }
 
 private extension DynamicTableViewModel {

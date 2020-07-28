@@ -30,6 +30,8 @@ class ESOptionCell: UITableViewCell {
 	private let selectionLabel: ENALabel
 	private let selectionImage: UIImageView
 
+	// MARK: - Configuration parameters.
+
 	private let minimumHeight: CGFloat = 100
 	private let inset: CGFloat = 20
 
@@ -91,6 +93,13 @@ class ESOptionCell: UITableViewCell {
 	@available(*, unavailable)
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
+	}
+
+	// MARK: - UITableViewCell methods.
+
+	override func setSelected(_ selected: Bool, animated: Bool) {
+		super.setSelected(selected, animated: animated)
+		selected ? didSelect() : didDeselect()
 	}
 
 	// MARK: - Configuration methods.
