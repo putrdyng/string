@@ -25,6 +25,13 @@ class ESSymptomsViewController: DynamicTableViewController {
 	// MARK: - Attributes.
 
 	private weak var coordinator: ExposureSubmissionCoordinator?
+	private var lastSelectedIndexPath: IndexPath?
+	private var selectedOption: Options? {
+		didSet {
+			// TODO: Debug code.
+			print("Selected option: \(String(describing: selectedOption))")
+		}
+	}
 
 	// MARK: - Initializers.
 
@@ -42,10 +49,37 @@ class ESSymptomsViewController: DynamicTableViewController {
 
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		title = "Title"
+		title = "Symptom-Beginn"
 		dynamicTableViewModel = .symptomsStartModel()
 		tableView.register(CalendarCell.self, forCellReuseIdentifier: CellReuseIdentifier.calendar.rawValue)
+		tableView.register(ESOptionCell.self, forCellReuseIdentifier: CellReuseIdentifier.symptoms.rawValue)
 	}
+
+	// MARK: - UITableViewDelegate methods.
+
+	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		deselectLastSelectedCell()
+		selectCell(at: indexPath)
+	}
+
+	// MARK: - Option selection methods.
+
+	private func deselectLastSelectedCell() {
+		guard
+			let indexPath = lastSelectedIndexPath,
+			let lastSelectedCell = tableView.cellForRow(at: indexPath) as? ESOptionCell else
+		{ return }
+
+		lastSelectedCell.didDeselect()
+	}
+
+	private func selectCell(at indexPath: IndexPath) {
+		guard let cell = tableView.cellForRow(at: indexPath) as? ESOptionCell else { return }
+		lastSelectedIndexPath = indexPath
+		selectedOption = cell.option
+		cell.didSelect()
+	}
+
 }
 
 private extension DynamicTableViewModel {
@@ -53,11 +87,19 @@ private extension DynamicTableViewModel {
 		.with {
 			$0.add(
 				.section(
-					header: DynamicHeader.text("Header"),
 					cells: [
-						.body(text: "Body",
-							  accessibilityIdentifier: "TODO"),
-						.calendar()
+						.title2(
+							text: "Wann sind die Symptome bei Ihnen aufgetreten?",
+							accessibilityIdentifier: "TODO"),
+						.body(
+							text: "Selektieren sie entweder das genaue Datum in dem Kalender oder wenn Sie sich nicht genau erinnern, eine der anderen Optionen.",
+							accessibilityIdentifier: "TODO"
+						),
+						.calendar(),
+						.option(text: "In den letzten 7 Tagen", option: .lastSevenDays),
+						.option(text: "Vor 1-2 Wochen", option: .oneToTwoWeeks),
+						.option(text: "Vor mehr als 2 Wochen", option: .moreThanTwoWeeks),
+						.option(text: "Keine Angabe", option: .noInformation)
 					]
 				)
 			)
@@ -68,6 +110,7 @@ private extension DynamicTableViewModel {
 extension ESSymptomsViewController {
 	enum CellReuseIdentifier: String, TableViewCellReuseIdentifiers {
 		case calendar = "calendarCell"
+		case symptoms = "symptomsCell"
 	}
 }
 
@@ -80,5 +123,28 @@ private extension DynamicCell {
 
 						// TODO: Do some setup here.
 		}
+	}
+}
+
+private extension DynamicCell {
+	static func option(text: String, option: ESSymptomsViewController.Options) -> Self {
+		.custom(
+		withIdentifier: ESSymptomsViewController.CellReuseIdentifier.symptoms,
+		action: .none,
+		accessoryAction: .none
+		) { _, cell, _ in
+			guard let cell = cell as? ESOptionCell else { return }
+			cell.configure(text: text, option: option)
+		}
+	}
+}
+
+extension ESSymptomsViewController {
+	enum Options {
+		case date(Date)
+		case lastSevenDays
+		case oneToTwoWeeks
+		case moreThanTwoWeeks
+		case noInformation
 	}
 }
