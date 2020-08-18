@@ -131,6 +131,8 @@ final class DMViewController: UITableViewController, RequiresAppDependencies {
 		case .manuallyRequestRisk:
 			vc = nil
 			manuallyRequestRisk()
+		case .testEU:
+			vc = DMEUFunctionViewController()
 		}
 		
 		if let vc = vc {

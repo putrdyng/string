@@ -186,6 +186,7 @@
 		71FE1C8C247AC79D00851FEB /* DynamicTableViewIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71FE1C8A247AC79D00851FEB /* DynamicTableViewIconCell.swift */; };
 		71FE1C8D247AC79D00851FEB /* DynamicTableViewIconCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 71FE1C8B247AC79D00851FEB /* DynamicTableViewIconCell.xib */; };
 		85142501245DA0B3009D2791 /* UIViewController+Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85142500245DA0B3009D2791 /* UIViewController+Alert.swift */; };
+		85196F7024EBD402008346D1 /* DMEUFunctionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85196F6F24EBD402008346D1 /* DMEUFunctionViewController.swift */; };
 		8539874F2467094E00D28B62 /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8539874E2467094E00D28B62 /* AppIcon.xcassets */; };
 		853D987A24694A8700490DBA /* ENAButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 853D987924694A8700490DBA /* ENAButton.swift */; };
 		853D98832469DC5000490DBA /* ExposureNotificationSetting.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 853D98822469DC5000490DBA /* ExposureNotificationSetting.storyboard */; };
@@ -633,6 +634,7 @@
 		71FE1C8A247AC79D00851FEB /* DynamicTableViewIconCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DynamicTableViewIconCell.swift; sourceTree = "<group>"; };
 		71FE1C8B247AC79D00851FEB /* DynamicTableViewIconCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DynamicTableViewIconCell.xib; sourceTree = "<group>"; };
 		85142500245DA0B3009D2791 /* UIViewController+Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Alert.swift"; sourceTree = "<group>"; };
+		85196F6F24EBD402008346D1 /* DMEUFunctionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DMEUFunctionViewController.swift; sourceTree = "<group>"; };
 		8539874E2467094E00D28B62 /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		853D987924694A8700490DBA /* ENAButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ENAButton.swift; sourceTree = "<group>"; };
 		853D98822469DC5000490DBA /* ExposureNotificationSetting.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = ExposureNotificationSetting.storyboard; sourceTree = "<group>"; };
@@ -1939,6 +1941,7 @@
 				B1FC2D1C24D9C87F00083C81 /* DMKeysViewController.swift */,
 				B1F82DF124718C7300E2E56A /* DMBackendConfigurationViewController.swift */,
 				B16457B624DC160B002879EB /* DMLastRiskCalculationViewController.swift */,
+				85196F6F24EBD402008346D1 /* DMEUFunctionViewController.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -2738,6 +2741,7 @@
 				CDCE11DB247D64D600F30825 /* NotificationSettingsOffTableViewCell.swift in Sources */,
 				51CE1B91246078B6002CF42A /* SectionSystemBackgroundDecorationView.swift in Sources */,
 				B112545A246F2C6500AB5036 /* ENTemporaryExposureKey+Convert.swift in Sources */,
+				85196F7024EBD402008346D1 /* DMEUFunctionViewController.swift in Sources */,
 				51486D9F2484FC0200FCE216 /* HomeRiskLevelCellConfigurator.swift in Sources */,
 				B1E8C99D2479D4E7006DC678 /* DMSubmissionStateViewController.swift in Sources */,
 				71FE1C8C247AC79D00851FEB /* DynamicTableViewIconCell.swift in Sources */,
