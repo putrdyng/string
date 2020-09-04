@@ -764,7 +764,7 @@
 
 "App_Information_About_Description" = "Instytut Roberta Kocha (RKI) to niemiecka federalna instytucja zdrowia publicznego. RKI publikuje aplikację Corona-Warn-App w imieniu rządu federalnego. Aplikacja stanowi cyfrowe rozszerzenie już wprowadzonych środków ochrony zdrowia publicznego: zachowanie dystansu społecznego, dbanie o higienę oraz noszenie maseczek.";
 
-"App_Information_About_Text" = "Wszystkie osoby korzystające z aplikacji pomagają w śledzeniu i przerwaniu łańcuchów zakażeń. Aplikacja zapisuje kontakty z innymi osobami lokalnie na Twoim urządzeniu. Otrzymasz powiadomienie, jeśli okaże się, że u osób, z którymi miałeś(-aś) kontakt, zdiagnozowano później COVID-19. Twoja tożsamość i prywatność są zawsze chronione.";
+"App_Information_About_Text" = "changing this string";
 
 /* App Information - FAQ */
 "App_Information_FAQ_Navigation" = "Często zadawane pytania";
